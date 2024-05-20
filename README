@@ -1,0 +1,11 @@
+import the7_dump.sql
+open myapp in visual studio
+open terminal 
+run : npm install express 
+run : npm run start
+
+click on the localhost link in the terminal / copy and post that link in your browser 
+Here is some user's login details (use that password , the passwords are hashed) :
+username : acannam7
+Password :  $2a$04$pqCougN3a7mbmX78khNYo.PgRkwKRJQNt6qOuUxQuthpG4kdZnEWu 
+
