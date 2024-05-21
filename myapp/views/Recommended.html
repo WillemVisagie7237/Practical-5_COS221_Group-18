@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recommended</title>
+  <link rel="stylesheet" href="Recommended.css">
+</head>
+<body>
+  <header id="navbar"></header>
+  <h2>Recommended</h2>
+  <p>Choose your criteria to get personalized recommendations:</p>
+  <form id="recommendationForm">
+    <label for="genre">What genres do you like:</label>
+    <select id="genre"></select>
+    <br>
+    <label for="releaseYear">Is there a specific release year:</label>
+    <input type="text" id="releaseYear" placeholder="YYYY">
+    <br>
+    <label for="productionStudio">Choose your favourite Production Studio:</label>
+    <select id="productionStudio"></select>
+    <br>
+    <button type="submit">Get Recommendations</button>
+  </form>
+  <ul id="recommendation-list"></ul>
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      populateDropdowns();
+      populateStudioDropdown();
+    });
+
+    function populateDropdowns() {
+      fetch('/content/genres')
+        .then(response => response.json())
+        .then(genres => {
+          const genreSelect = document.getElementById('genre');
+          genreSelect.innerHTML = ''; // Clear previous options
+          const uniqueGenres = new Set();
+          genres.forEach(genreEntry => {
+            const individualGenres = genreEntry.split('|');
+            individualGenres.forEach(genre => uniqueGenres.add(genre.trim())); // Add trimmed individual genres to the Set
+          });
+          const sortedGenres = Array.from(uniqueGenres).sort();
+          sortedGenres.forEach(genre => {
+            const option = document.createElement('option');
+            option.value = genre;
+            option.textContent = genre;
+            genreSelect.appendChild(option);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching genres:', error);
+        });
+    }
+
+    function populateStudioDropdown() {
+      fetch('/content/studios')
+        .then(response => response.json())
+        .then(studios => {
+          const studioSelect = document.getElementById('productionStudio');
+          studioSelect.innerHTML = ''; // Clear previous options
+          studios.forEach(studio => {
+            const option = document.createElement('option');
+            option.value = studio.id;
+            option.textContent = studio.name;
+            studioSelect.appendChild(option);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching production studios:', error);
+        });
+    }
+
+    document.getElementById('recommendationForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const genre = document.getElementById('genre').value;
+      const releaseYear = document.getElementById('releaseYear').value;
+      const productionStudio = document.getElementById('productionStudio').value;
+      fetch(`/recommendations?genre=${genre}&releaseYear=${releaseYear}&productionStudio=${productionStudio}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch recommendations');
+          }
+          return response.json();
+        })
+        .then(recommendations => {
+  if (Array.isArray(recommendations)) {
+    displayRecommendations(recommendations);
+  } else if (typeof recommendations === 'object') {
+    // Convert single recommendation object to an array containing that object
+    displayRecommendations([recommendations]);
+  } else {
+    console.error('Invalid data format for recommendations:', recommendations);
+    const recommendationList = document.getElementById('recommendation-list');
+    recommendationList.innerHTML = '<p>Error fetching recommendations. Please try again later.</p>';
+  }
+})
+        .catch(error => {
+          console.error('Error fetching recommendations:', error);
+          const recommendationList = document.getElementById('recommendation-list');
+          recommendationList.innerHTML = '<p>Error fetching recommendations. Please try again later.</p>';
+        });
+    });
+
+    function displayRecommendations(recommendations) {
+      const recommendationList = document.getElementById('recommendation-list');
+      recommendationList.innerHTML = ''; // Clear previous results
+      if (recommendations.length === 0) {
+        recommendationList.innerHTML = '<p>No recommendations found.</p>';
+        return;
+      }
+      recommendations.forEach(recommendation => {
+        const item = document.createElement('li');
+        item.textContent = `${recommendation.title} (${recommendation.release_year}) - Genre: ${recommendation.genre} - Studio: ${recommendation.studio_name}`;
+        recommendationList.appendChild(item);
+      });
+    }
+
+
+    
+  </script>
+</body>
+</html>
