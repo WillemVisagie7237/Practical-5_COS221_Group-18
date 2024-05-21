@@ -21,3 +21,8 @@ DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=/*password*/ (add your own root password, this won't be uploaded)
 DB_DATABASE=the7
+
+For task 7 you can use your own RDBMS (I use DBeaver-CE). Go to the SQL script part and add the SQL query you want to analyze, but add EXPLAIN in front of it, something like:
+EXPLAIN SELECT * FROM user WHERE username = /*add username here*/;
+This will generate a query that says it either needs to go through the entire database (if it is not the primary key). This can be used to see how you can optimise some tables
+and/or queries.
