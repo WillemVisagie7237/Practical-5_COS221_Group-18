@@ -3,7 +3,7 @@ const session = require('express-session');
 const mariadb = require('mariadb');
 const path = require('path');
 require('dotenv').config();
-
+const bcrypt = require('bcrypt');
 
 const app = express();
 const port = 3007;
@@ -61,7 +61,35 @@ const getConnection = async () => {
 };
 
 app.get('/', (req, res) => {
-  res.redirect('/login.html');
+  res.redirect('/register.html');
+});
+
+app.post('/register', async (req, res) => {
+  const { username, password, Re_enter_password} = req.body;
+
+  if (password != Re_enter_password){
+    console.error('Password is not the same');
+    res.redirect('/register.html?error=password_mismatch');
+    return;
+  }
+
+  let conn;
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    conn = await getConnection();
+    const result = await conn.query('INSERT INTO user (username, password) VALUES (?, ?)', [username, hashedPassword]);
+    if (result.affectedRows > 0) {
+      req.session.user = { username };
+      res.redirect('/Main.html');
+    } else {
+      res.redirect('/register.html?error=invalid_credentials');
+    }
+  } catch (err) {
+    console.error('Error querying database:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    if (conn) conn.release();
+  }
 });
 
 app.post('/login', async (req, res) => {
