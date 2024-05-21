@@ -429,9 +429,7 @@ function displayContent(contentArray) {
       <p>Rating: ${content.rating}</p>
       <p>Genre: ${content.genre}</p>
       <p>Production Studio ID: ${content.production_studio_id}</p>
-      <!-- Add more details as needed -->
-
-      <!-- Add edit/delete buttons or links here -->
+     
     `;
 
     contentContainer.appendChild(contentElement);
