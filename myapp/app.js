@@ -1,3 +1,4 @@
+//Required libraries and/or packages
 const express = require('express');
 const session = require('express-session');
 const mariadb = require('mariadb');
@@ -5,9 +6,11 @@ const path = require('path');
 require('dotenv').config();
 const bcrypt = require('bcrypt');
 
+//Creates Express.js object, along with port number
 const app = express();
 const port = 3007;
 
+//Database connection
 const pool = mariadb.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -16,12 +19,14 @@ const pool = mariadb.createPool({
   connectionLimit: 10
 });
 
+//Starts the session middleware
 app.use(session({
   secret: 'secret',
   resave: false,
   saveUninitialized: true
 }));
 
+//Autenticates user
 const isAuthenticated = (req, res, next) => {
   if (req.session && req.session.user) {
     return next();
@@ -32,6 +37,7 @@ const isAuthenticated = (req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+//Next couple of lines is needed to to authenticate the user and then send to the correct page
 app.use((req, res, next) => {
   console.log(`Incoming request: ${req.method} ${req.url}`);
   next();
@@ -51,6 +57,7 @@ app.get('/contentDisplay.html', isAuthenticated, (req, res) => {
 
 app.use(express.static(path.join(__dirname, 'views')));
 
+//Gets the connection to the database
 const getConnection = async () => {
   try {
     return await pool.getConnection();
@@ -60,10 +67,12 @@ const getConnection = async () => {
   }
 };
 
+//If the browser is sent to the root directory, it is automatically sent to the register page
 app.get('/', (req, res) => {
   res.redirect('/register.html');
 });
 
+//code for register the user and then sending the user to the main page
 app.post('/register', async (req, res) => {
   const { username, password, Re_enter_password} = req.body;
 
@@ -92,6 +101,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
+//Code for the login part and then sends the user to the correct page
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -113,12 +123,13 @@ app.post('/login', async (req, res) => {
   }
 });
 
-
+//Just a normal logout
 app.get('/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/login.html');
 });
 
+//Either updates or inserts into the content table
 app.post('/content', isAuthenticated, async (req, res) => {
   const { id, title, description, releaseYear, rating, genre, runtime, type } = req.body;
 
@@ -150,6 +161,7 @@ app.post('/content', isAuthenticated, async (req, res) => {
   }
 });
 
+//Deletes from the content table
 app.post('/content/delete', isAuthenticated, async (req, res) => {
   const { id, type } = req.body;
 
@@ -171,6 +183,7 @@ app.post('/content/delete', isAuthenticated, async (req, res) => {
   }
 });
 
+//
 app.post('/persons', isAuthenticated, async (req, res) => {
   const { firstName, lastName, dob, role } = req.body;
 
