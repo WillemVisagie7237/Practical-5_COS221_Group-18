@@ -41,8 +41,8 @@ app.get('/Main.html', isAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'Main.html'));
 });
 
-app.get('/Manage.html', isAuthenticated, (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'Manage.html'));
+app.get('/manage.html', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'manage.html'));
 });
 
 app.get('/contentDisplay.html', isAuthenticated, (req, res) => {
