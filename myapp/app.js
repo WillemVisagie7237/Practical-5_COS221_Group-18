@@ -108,10 +108,19 @@ app.post('/login', async (req, res) => {
   let conn;
   try {
     conn = await getConnection();
-    const user = await conn.query('SELECT * FROM user WHERE username = ? AND password = ?', [username, password]);
+    const user = await conn.query('SELECT * FROM user WHERE username = ?', [username]);
     if (user.length > 0) {
-      req.session.user = user[0];
-      res.redirect('/Main.html');
+      const foundUser = user[0];
+      const storedHash = foundUser.password;
+
+      const isMatch = await bcrypt.compare(password, storedHash);
+      
+      if (isMatch){
+        req.session.user = user;
+        res.redirect('/Main.html');
+      }else{
+        res.redirect('/login.html?error=invalid_credentials');
+      }
     } else {
       res.redirect('/login.html?error=invalid_credentials');
     }
