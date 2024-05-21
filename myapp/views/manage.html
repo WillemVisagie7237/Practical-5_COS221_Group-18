@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="main.css">
+  <title>Manage</title>
+</head>
+<body>
+
+  <header id="navbar">
+    <!-- Navigation bar will be inserted here -->
+  </header>
+  
+  <div class="container">
+    <h1>Manage</h1>
+
+    <!-- Add Person Section -->
+    <section>
+      <h2>Add/Update a Person</h2>
+      <div>
+        <input id="personId" placeholder="Person ID">
+        <select id="roleSelect">
+          <option value="actor">Actor</option>
+          <option value="director">Director</option>
+          <option value="writer">Writer</option>
+          <option value="user">User</option>
+        </select>
+        <input type="text" id="firstName" placeholder="First Name">
+        <input type="text" id="lastName" placeholder="Last Name">
+        <input type="text" id="dob" placeholder="Date of Birth (YYYY)">
+        <button class="button-gap" onclick="addOrUpdatePerson()">Add / Update Person</button>
+        <button onclick="deletePerson()">Delete Person</button>
+      </div>
+    </section>
+    
+
+    <!-- Manage Production Studios Section -->
+    <section>
+      <h2>Manage Production Studios</h2>
+      <div>
+        <input type="text" id="studioId" placeholder="Enter studio ID (for editing)">
+        <input type="text" id="studioName" placeholder="Enter production studio name">
+        <input type="text" id="studioCountry" placeholder="Enter country">
+        <input type="text" id="foundingYear" placeholder="Enter founding year">
+        <input type="text" id="ceo" placeholder="Enter CEO">
+        <input type="text" id="website" placeholder="Enter website">
+        <button onclick="addProductionStudio()">Add Production Studio</button>
+        <button onclick="editProductionStudio()">Edit Production Studio</button>
+        <input type="text" id="deleteStudioId" placeholder="Enter studio ID (for deletion)">
+        <button onclick="deleteProductionStudio()">Delete Production Studio</button>
+      </div>
+    </section>
+
+    <!-- Manage Movie/Series Genres Section -->
+    <section>
+      <h2>Manage Movie/Series Genres</h2>
+      <div>
+        <label for="contentId">Content ID:</label>
+        <input type="text" id="contentId" placeholder="Content ID">
+        <input type="text" id="genre" placeholder="Genre">
+        <button onclick="addOrUpdateGenre()">Add / Update Genre</button>
+        <button onclick="deleteGenre()">Delete Genre</button>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="script.js"></script>
+
+  <script>
+    // Fetch and insert the navigation bar
+    fetch('navbar.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('navbar').innerHTML = data;
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content Management System</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+
+  <header id="navbar">
+    <!-- Navigation bar will be inserted here -->
+  </header>
+
+  <div class="container">
+    <h1>Welcome to the Content Management System</h1>
+    
+
+    <div class="form-container">
+      <h2>Add/Edit Movie or TV Series</h2>
+      <form id="contentForm" method="post" action="/content">
+        <div class="form-group">
+          <label for="id">ID (for edit/delete)</label>
+          <input type="number" id="id" name="id" placeholder="Enter ID (leave empty to add new)">
+        </div>
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" id="title" name="title" placeholder="Enter title" required>
+        </div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" placeholder="Enter description"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="releaseYear">Release Year</label>
+          <input type="number" id="releaseYear" name="releaseYear" placeholder="Enter release year">
+        </div>
+        <div class="form-group">
+          <label for="rating">Rating</label>
+          <input type="number" step="0.1" id="rating" name="rating" placeholder="Enter rating">
+        </div>
+        <div class="form-group">
+          <label for="genre">Genre</label>
+          <input type="text" id="genre" name="genre" placeholder="Enter genre">
+        </div>
+        <div class="form-group">
+          <label for="type">Type</label>
+          <select id="type" name="type">
+            <option value="movie">Movie</option>
+            <option value="series">TV Series</option>
+          </select>
+        </div>
+        <div class="form-group" id="runtimeContainer">
+          <label for="runtime">Runtime or Seasons</label>
+          <input type="number" id="runtime" name="runtime" placeholder="Enter runtime or seasons">
+        </div>
+        <button type="submit">Save</button>
+      </form>
+    </div>
+
+    <div class="form-container">
+      <h2>Delete Content</h2>
+      <form id="deleteForm" method="post" action="/content/delete">
+        <div class="form-group">
+          <label for="deleteId">ID</label>
+          <input type="number" id="deleteId" name="id" placeholder="Enter ID to delete" required>
+        </div>
+        <div class="form-group">
+          <label for="contentType">Type</label>
+          <select id="contentType" name="type">
+            <option value="movie">Movie</option>
+            <option value="series">TV Series</option>
+          </select>
+        </div>
+        <button type="submit">Delete</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  
+  <script>
+    // Fetch and insert the navigation bar
+    fetch('navbar.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('navbar').innerHTML = data;
+      });
+  </script>
+</body>
+</html>
