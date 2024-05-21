@@ -248,6 +248,8 @@ function addOrUpdateGenre() {
     if (data.success) {
       alert(`Genre "${genre}" ${contentId ? 'updated' : 'added'} successfully to content ID ${contentId}.`);
       // You may perform additional actions here, such as refreshing the genre list
+      document.getElementById('contentId').value = "";
+      document.getElementById('genre').value = "";
     } else {
       alert('Error adding/updating genre.');
     }
