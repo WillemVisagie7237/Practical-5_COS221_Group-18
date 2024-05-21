@@ -376,20 +376,8 @@ app.get('/content/genres', isAuthenticated, async (req, res) => {
   }
 });
 
-// GET endpoint to fetch production studios
-app.get('/content/studios', isAuthenticated, async (req, res) => {
-  let conn;
-  try {
-    conn = await getConnection();
-    const studios = await conn.query('SELECT * FROM production_studio');
-    res.json(studios);
-  } catch (err) {
-    console.error('Error fetching production studios:', err);
-    res.status(500).json({ error: 'Internal server error' });
-  } finally {
-    if (conn) conn.release();
-  }
-});
+
+
 
 app.get('/filtered-content', isAuthenticated, async (req, res) => {
   let { minReleaseYear, maxReleaseYear, minRating, maxRating, sortBy, genre, studio } = req.query;
@@ -399,6 +387,16 @@ app.get('/filtered-content', isAuthenticated, async (req, res) => {
   maxReleaseYear = parseFloat(maxReleaseYear);
   minRating = parseFloat(minRating);
   maxRating = parseFloat(maxRating);
+
+  // Map client-side sort parameter to database column names
+  const sortColumnMap = {
+    releaseYear: 'release_year',
+    title: 'title',
+    rating: 'rating'
+  };
+
+  // Get the correct database column name for sorting
+  sortBy = sortColumnMap[sortBy] || 'title';
 
   // Construct the SQL query dynamically based on the filter parameters
   let sql = 'SELECT c.*, ps.name AS studio_name FROM content c LEFT JOIN production_studio ps ON c.production_studio_id = ps.id WHERE 1=1';
@@ -427,31 +425,35 @@ app.get('/filtered-content', isAuthenticated, async (req, res) => {
   }
 
   if (studio && studio !== '(no production studio listed)') {
-    // Retrieve the production studio ID based on its name
-    const studioIdQuery = 'SELECT id FROM production_studio WHERE name = ?';
-    const studioIdResult = await conn.query(studioIdQuery, [studio]);
-    
-    // Check if the studio name is valid
-    if (studioIdResult.length > 0) {
+    let conn;
+    try {
+      conn = await getConnection();
+      // Retrieve the production studio ID based on its name
+      const studioIdQuery = 'SELECT id FROM production_studio WHERE name = ?';
+      const studioIdResult = await conn.query(studioIdQuery, [studio]);
+
+      // Check if the studio name is valid
+      if (studioIdResult.length > 0) {
         const studioId = studioIdResult[0].id;
         sql += ' AND production_studio_id = ?';
         params.push(studioId);
-    } else {
+      } else {
         // Handle the case when the studio name is not found
         console.error('Production studio not found:', studio);
         res.status(400).json({ error: 'Production studio not found' });
         return;
+      }
+    } finally {
+      if (conn) conn.release();
     }
-}
-
-  // Ensure that sortBy is valid to prevent SQL injection
-  const validSortBy = ['title', 'release_year', 'rating']; // Valid columns for sorting
-  if (validSortBy.includes(sortBy)) {
-    sql += ` ORDER BY ${sortBy}`;
-  } else {
-    // Default sorting column if sortBy is invalid
-    sql += ' ORDER BY c.title';
   }
+
+  // Add sorting clause
+  sql += ` ORDER BY c.${sortBy}`;
+
+  // Log the SQL query for debugging
+  console.log('Executing SQL query:', sql);
+  console.log('With parameters:', params);
 
   let conn;
   try {
@@ -465,6 +467,8 @@ app.get('/filtered-content', isAuthenticated, async (req, res) => {
     if (conn) conn.release();
   }
 });
+
+
 
 
 
