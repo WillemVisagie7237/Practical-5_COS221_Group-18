@@ -386,12 +386,15 @@ async function applyFilters() {
     const ratingRange = document.getElementById('ratingRange').value;
     const [minRating, maxRating] = ratingRange.split('-').map(rating => rating.trim() ? parseFloat(rating.trim()) : null);
 
-    // Retrieve selected genre(s)
+    // Retrieve selected genre
     const selectedGenre = document.getElementById('genre').value;
 
+    // Retrieve selected production studio
+    const selectedStudio = document.getElementById('productionStudio').value;
+
     // Send a request to the server to fetch filtered content
-    let url = `/filtered-content?minReleaseYear=${minReleaseYear}&maxReleaseYear=${maxReleaseYear}&minRating=${minRating}&maxRating=${maxRating}&sortBy=${sortBy}&genre=${selectedGenre}`;
-    
+    let url = `/filtered-content?minReleaseYear=${minReleaseYear}&maxReleaseYear=${maxReleaseYear}&minRating=${minRating}&maxRating=${maxRating}&sortBy=${sortBy}&genre=${selectedGenre}&studio=${selectedStudio}`;
+
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error('Failed to fetch filtered content');
@@ -428,7 +431,7 @@ function displayContent(contentArray) {
       <p>Release Year: ${content.release_year}</p>
       <p>Rating: ${content.rating}</p>
       <p>Genre: ${content.genre}</p>
-      <p>Production Studio ID: ${content.production_studio_id}</p>
+      <p>Production Studio ID: ${content.studio_name}</p>
      
     `;
 

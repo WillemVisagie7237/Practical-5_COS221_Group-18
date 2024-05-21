@@ -388,14 +388,29 @@ app.get('/content/genres', isAuthenticated, async (req, res) => {
 
 
 
+app.get('/content/studios', isAuthenticated, async (req, res) => {
+  let conn;
+  try {
+    conn = await getConnection();
+    const studios = await conn.query('SELECT * FROM production_studio');
+    res.json(studios);
+  } catch (err) {
+    console.error('Error fetching production studios:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    if (conn) conn.release();
+  }
+});
+
+
 app.get('/filtered-content', isAuthenticated, async (req, res) => {
   let { minReleaseYear, maxReleaseYear, minRating, maxRating, sortBy, genre, studio } = req.query;
 
-  // Parse filter parameters to ensure they are numeric
-  minReleaseYear = parseFloat(minReleaseYear);
-  maxReleaseYear = parseFloat(maxReleaseYear);
-  minRating = parseFloat(minRating);
-  maxRating = parseFloat(maxRating);
+  // Parse filter parameters to ensure they are numeric or null
+  minReleaseYear = parseFloat(minReleaseYear) || null;
+  maxReleaseYear = parseFloat(maxReleaseYear) || null;
+  minRating = parseFloat(minRating) || null;
+  maxRating = parseFloat(maxRating) || null;
 
   // Map client-side sort parameter to database column names
   const sortColumnMap = {
@@ -408,22 +423,22 @@ app.get('/filtered-content', isAuthenticated, async (req, res) => {
   sortBy = sortColumnMap[sortBy] || 'title';
 
   // Construct the SQL query dynamically based on the filter parameters
-  let sql = 'SELECT c.*, ps.name AS studio_name FROM content c LEFT JOIN production_studio ps ON c.production_studio_id = ps.id WHERE 1=1';
+  let sql = 'SELECT c.*, COALESCE(ps.name, \'(no production studio listed)\') AS studio_name FROM content c LEFT JOIN production_studio ps ON c.production_studio_id = ps.id AND ps.id IS NOT NULL WHERE 1=1';
   const params = [];
 
-  if (!isNaN(minReleaseYear)) {
+  if (minReleaseYear !== null) {
     sql += ' AND c.release_year >= ?';
     params.push(minReleaseYear);
   }
-  if (!isNaN(maxReleaseYear)) {
+  if (maxReleaseYear !== null) {
     sql += ' AND c.release_year <= ?';
     params.push(maxReleaseYear);
   }
-  if (!isNaN(minRating)) {
+  if (minRating !== null) {
     sql += ' AND c.rating >= ?';
     params.push(minRating);
   }
-  if (!isNaN(maxRating)) {
+  if (maxRating !== null) {
     sql += ' AND c.rating <= ?';
     params.push(maxRating);
   }
@@ -433,10 +448,13 @@ app.get('/filtered-content', isAuthenticated, async (req, res) => {
     params.push(genre);
   }
 
-  if (studio && studio !== '(no production studio listed)') {
-    let conn;
-    try {
-      conn = await getConnection();
+  if (studio) {
+    const isStudioIdNumeric = !isNaN(studio);
+
+    if (isStudioIdNumeric) {
+      sql += ' AND production_studio_id = ?';
+      params.push(parseInt(studio));
+    } else {
       // Retrieve the production studio ID based on its name
       const studioIdQuery = 'SELECT id FROM production_studio WHERE name = ?';
       const studioIdResult = await conn.query(studioIdQuery, [studio]);
@@ -452,8 +470,6 @@ app.get('/filtered-content', isAuthenticated, async (req, res) => {
         res.status(400).json({ error: 'Production studio not found' });
         return;
       }
-    } finally {
-      if (conn) conn.release();
     }
   }
 
@@ -476,6 +492,189 @@ app.get('/filtered-content', isAuthenticated, async (req, res) => {
     if (conn) conn.release();
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Old 
+
+
+
+// app.get('/filtered-content', isAuthenticated, async (req, res) => {
+//   let { minReleaseYear, maxReleaseYear, minRating, maxRating, sortBy, genre, studio } = req.query;
+
+//   // Parse filter parameters to ensure they are numeric
+//   minReleaseYear = parseFloat(minReleaseYear);
+//   maxReleaseYear = parseFloat(maxReleaseYear);
+//   minRating = parseFloat(minRating);
+//   maxRating = parseFloat(maxRating);
+
+
+  
+
+//   // Construct the SQL query dynamically based on the filter parameters
+//   let sql = 'SELECT c.*, ps.name AS studio_name FROM content c LEFT JOIN production_studio ps ON c.production_studio_id = ps.id WHERE 1=1';
+//   const params = [];
+
+//   if (!isNaN(minReleaseYear)) {
+//     sql += ' AND c.release_year >= ?';
+//     params.push(minReleaseYear);
+//   }
+//   if (!isNaN(maxReleaseYear)) {
+//     sql += ' AND c.release_year <= ?';
+//     params.push(maxReleaseYear);
+//   }
+//   if (!isNaN(minRating)) {
+//     sql += ' AND c.rating >= ?';
+//     params.push(minRating);
+//   }
+//   if (!isNaN(maxRating)) {
+//     sql += ' AND c.rating <= ?';
+//     params.push(maxRating);
+//   }
+
+//   if (genre && genre !== '(no genres listed)') {
+//     sql += ' AND c.genre = ?';
+//     params.push(genre);
+//   }
+
+//   if (studio && studio !== '(no production studio listed)') {
+//     // Retrieve the production studio ID based on its name
+//     const studioIdQuery = 'SELECT id FROM production_studio WHERE name = ?';
+//     const studioIdResult = await conn.query(studioIdQuery, [studio]);
+
+//     // Check if the studio name is valid
+//     if (studioIdResult.length > 0) {
+//       const studioId = studioIdResult[0].id;
+//       sql += ' AND production_studio_id = ?';
+//       params.push(studioId);
+//     } else {
+//       // Handle the case when the studio name is not found
+//       console.error('Production studio not found:', studio);
+//       res.status(400).json({ error: 'Production studio not found' });
+//       return;
+//     }
+//   }
+
+//   // Ensure that sortBy is valid to prevent SQL injection
+//   const validSortBy = ['title', 'release_year', 'rating']; 
+//   if (validSortBy.includes(sortBy)) {
+//     sql += ` ORDER BY c.${sortBy}`;
+//   } else {
+//     // Default sorting column if sortBy is invalid
+//     sql += ' ORDER BY c.title';
+//   }
+
+//   // Log the SQL query for debugging
+//   console.log('Executing SQL query:', sql);
+//   console.log('With parameters:', params);
+
+//   let conn;
+//   try {
+//     conn = await getConnection();
+//     const content = await conn.query(sql, params);
+//     res.json(content);
+//   } catch (err) {
+//     console.error('Error fetching filtered content:', err);
+//     res.status(500).json({ error: 'Internal server error' });
+//   } finally {
+//     if (conn) conn.release();
+//   }
+// });
+
+
+
+// app.get('/filtered-content', isAuthenticated, async (req, res) => {
+//   let { minReleaseYear, maxReleaseYear, minRating, maxRating, sortBy, genre, studio } = req.query;
+
+//   // Parse filter parameters to ensure they are numeric
+//   minReleaseYear = parseFloat(minReleaseYear);
+//   maxReleaseYear = parseFloat(maxReleaseYear);
+//   minRating = parseFloat(minRating);
+//   maxRating = parseFloat(maxRating);
+
+//   // Map client-side sort parameter to database column names
+//   const sortColumnMap = {
+//     releaseYear: 'release_year',
+//     title: 'title',
+//     rating: 'rating'
+//   };
+
+//   // Get the correct database column name for sorting
+//   sortBy = sortColumnMap[sortBy] || 'title';
+
+//   // Construct the SQL query dynamically based on the filter parameters
+//   let sql = 'SELECT c.*, ps.name AS studio_name FROM content c LEFT JOIN production_studio ps ON c.production_studio_id = ps.id WHERE 1=1';
+//   const params = [];
+
+//   if (!isNaN(minReleaseYear)) {
+//     sql += ' AND c.release_year >= ?';
+//     params.push(minReleaseYear);
+//   }
+//   if (!isNaN(maxReleaseYear)) {
+//     sql += ' AND c.release_year <= ?';
+//     params.push(maxReleaseYear);
+//   }
+//   if (!isNaN(minRating)) {
+//     sql += ' AND c.rating >= ?';
+//     params.push(minRating);
+//   }
+//   if (!isNaN(maxRating)) {
+//     sql += ' AND c.rating <= ?';
+//     params.push(maxRating);
+//   }
+
+//   if (genre && genre !== '(no genres listed)') {
+//     sql += ' AND c.genre = ?';
+//     params.push(genre);
+//   }
+
+//   if (studio && studio !== '(no production studio listed)') {
+//     // Retrieve the production studio ID based on its name
+//     const studioIdQuery = 'SELECT id FROM production_studio WHERE name = ?';
+//     const studioIdResult = await conn.query(studioIdQuery, [studio]);
+
+//     // Check if the studio name is valid
+//     if (studioIdResult.length > 0) {
+//       const studioId = studioIdResult[0].id;
+//       sql += ' AND production_studio_id = ?';
+//       params.push(studioId);
+//     } else {
+//       // Handle the case when the studio name is not found
+//       console.error('Production studio not found:', studio);
+//       res.status(400).json({ error: 'Production studio not found' });
+//       return;
+//     }
+//   }
+
+//   // Add sorting clause
+//   sql += ` ORDER BY c.${sortBy}`;
+
+//   // Log the SQL query for debugging
+//   console.log('Executing SQL query:', sql);
+//   console.log('With parameters:', params);
+
+//   let conn;
+//   try {
+//     conn = await getConnection();
+//     const content = await conn.query(sql, params);
+//     res.json(content);
+//   } catch (err) {
+//     console.error('Error fetching filtered content:', err);
+//     res.status(500).json({ error: 'Internal server error' });
+//   } finally {
+//     if (conn) conn.release();
+//   }
+//});
 
 
 
