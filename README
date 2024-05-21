@@ -9,3 +9,11 @@ Here is some user's login details (use that password , the passwords are hashed)
 username : acannam7
 Password :  $2a$04$pqCougN3a7mbmX78khNYo.PgRkwKRJQNt6qOuUxQuthpG4kdZnEWu 
 
+Create a ".env" file in your main directory, along with a ".gitignore" (notice there is nothing before the dot, as they are hidden files)
+Next run npm install dotenv
+In the .gitignore file, add .env so that file is not uploaded to github
+In the .env file add:
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=/*password*/ (add your own root password, this won't be uploaded)
+DB_DATABASE=the7
