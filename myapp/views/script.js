@@ -149,6 +149,12 @@ function addProductionStudio() {
     if (data.success) {
       alert('Production studio added successfully!');
       // You may perform additional actions here, such as refreshing the studio list
+      //Clearing the textboxes
+      document.getElementById('studioName').value = "";
+      document.getElementById('studioCountry').value = "";
+      document.getElementById('foundingYear').value = "";
+      document.getElementById('ceo').value = "";
+      document.getElementById('website').value = "";
     } else {
       alert('Error adding production studio.');
     }
@@ -181,6 +187,12 @@ function editProductionStudio() {
     if (data.success) {
       alert('Production studio updated successfully!');
       // You may perform additional actions here, such as refreshing the studio list
+      document.getElementById('studioId').value = "";
+      document.getElementById('studioName').value = "";
+      document.getElementById('studioCountry').value = "";
+      document.getElementById('foundingYear').value = "";
+      document.getElementById('ceo').value = "";
+      document.getElementById('website').value = "";
     } else {
       alert('Error updating production studio.');
     }
@@ -201,6 +213,7 @@ function deleteProductionStudio() {
     if (data.success) {
       alert('Production studio deleted successfully!');
       // You may perform additional actions here, such as refreshing the studio list
+      document.getElementById('deleteStudioId').value = "";
     } else {
       alert('Error deleting production studio.');
     }
