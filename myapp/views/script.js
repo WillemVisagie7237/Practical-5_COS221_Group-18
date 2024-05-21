@@ -439,9 +439,8 @@ function displayContent(contentArray) {
   });
 }
 
-
-// Event listener for filter button
 document.getElementById('filter-button').addEventListener('click', applyFilters);
+
 
 
 
