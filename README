@@ -1,5 +1,7 @@
 Use the normal files, not the .zip ones, as that makes it easier to use :)
 
+npm install bcrypt - Needed for the Registration form
+
 import the7_dump.sql
 open myapp in visual studio
 open terminal 
