@@ -1,3 +1,5 @@
+Use the normal files, not the .zip ones, as that makes it easier to use :)
+
 import the7_dump.sql
 open myapp in visual studio
 open terminal 
