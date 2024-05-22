@@ -9,6 +9,7 @@ run : npm install express
 run : npm run start
 
 click on the localhost link in the terminal / copy and post that link in your browser 
+(You need to register these details before you can log in, we don't have a server to use)
 Here is some user's login details (use that password , the passwords are hashed) :
 username : User
 Password :  Password1! 
