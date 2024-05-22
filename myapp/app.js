@@ -89,7 +89,7 @@ app.post('/register', async (req, res) => {
     const result = await conn.query('INSERT INTO user (username, password) VALUES (?, ?)', [username, hashedPassword]);
     if (result.affectedRows > 0) {
       req.session.user = { username };
-      res.redirect('/Main.html');
+      res.redirect('/Recommended.html');
     } else {
       res.redirect('/register.html?error=invalid_credentials');
     }

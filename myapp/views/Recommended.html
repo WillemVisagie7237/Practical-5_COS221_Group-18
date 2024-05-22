@@ -85,17 +85,20 @@
           return response.json();
         })
         .then(recommendations => {
-  if (Array.isArray(recommendations)) {
-    displayRecommendations(recommendations);
-  } else if (typeof recommendations === 'object') {
-    // Convert single recommendation object to an array containing that object
-    displayRecommendations([recommendations]);
-  } else {
-    console.error('Invalid data format for recommendations:', recommendations);
-    const recommendationList = document.getElementById('recommendation-list');
-    recommendationList.innerHTML = '<p>Error fetching recommendations. Please try again later.</p>';
-  }
-})
+          if (Array.isArray(recommendations)) {
+            displayRecommendations(recommendations);
+          } else if (typeof recommendations === 'object') {
+            // Convert single recommendation object to an array containing that object
+            displayRecommendations([recommendations]);
+          } else {
+            console.error('Invalid data format for recommendations:', recommendations);
+            const recommendationList = document.getElementById('recommendation-list');
+            recommendationList.innerHTML = '<p>Error fetching recommendations. Please try again later.</p>';
+          }
+          setTimeout(() => {
+            window.location.href = '/Main.html';
+          }, 3500);
+        })
         .catch(error => {
           console.error('Error fetching recommendations:', error);
           const recommendationList = document.getElementById('recommendation-list');
