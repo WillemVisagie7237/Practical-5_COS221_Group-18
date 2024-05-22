@@ -93,9 +93,9 @@ app.post('/register', async (req, res) => {
     if (personResult.affectedRows == 0){
       res.redirect('/register.html?error=invalid_credentials');
     }else{
-      const person = await conn.query('SELECT person_id FROM person WHERE first_name = ? AND last_name = ? AND role = ?', [firstname, lastname, role]);
-      const idPerson = person[0];
-      const result = await conn.query('INSERT INTO user (username, password) VALUES (?, ?)', [username, hashedPassword]);
+      const idPerson = await conn.query('SELECT person_id FROM person WHERE first_name = ? AND last_name = ? AND date_of_birth = ?', [firstname, lastname, year]);
+      const id = idPerson[0].person_id;
+      const result = await conn.query('INSERT INTO user (username, password, person_id) VALUES (?, ?, ?)', [username, hashedPassword, id]);
 
       if (result.affectedRows > 0) {
         req.session.user = { username };
