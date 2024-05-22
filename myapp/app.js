@@ -72,7 +72,8 @@ app.get('/', (req, res) => {
   res.redirect('/register.html');
 });
 
-//code for register the user and then sending the user to the main page
+//code for register the user and then sending the user to the recommendations page
+//After you click the submit, it goes to main in 3.5 seconds
 app.post('/register', async (req, res) => {
   const { username, password, Re_enter_password} = req.body;
 
