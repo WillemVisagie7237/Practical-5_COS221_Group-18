@@ -167,7 +167,7 @@ app.post('/content', isAuthenticated, async (req, res) => {
       if (type === 'movie') {
         await conn.query('INSERT INTO movie (content_id, runtime) VALUES (?, ?)', [contentId, runtime]);
       } else if (type === 'series') {
-        await conn.query('INSERT INTO series (content_id, seasons) VALUES (?, ?)', [contentId, runtime]);
+        await conn.query('INSERT INTO series (content_id, seasons , end_year) VALUES (?, ?,?)', [contentId, runtime, releaseYear]);
       }
     }
     res.json({ success: true });
