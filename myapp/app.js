@@ -75,7 +75,7 @@ app.get('/', (req, res) => {
 //code for register the user and then sending the user to the recommendations page
 //After you click the submit, it goes to main in 3.5 seconds
 app.post('/register', async (req, res) => {
-  const { username, password, Re_enter_password} = req.body;
+  const { username, password, Re_enter_password, role, dob, firstname, lastname} = req.body;
 
   if (password != Re_enter_password){
     console.error('Password is not the same');
@@ -87,12 +87,22 @@ app.post('/register', async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     conn = await getConnection();
-    const result = await conn.query('INSERT INTO user (username, password) VALUES (?, ?)', [username, hashedPassword]);
-    if (result.affectedRows > 0) {
-      req.session.user = { username };
-      res.redirect('/Recommended.html');
-    } else {
+    const selectedDate = new Date(dob);
+    const year = selectedDate.getFullYear();
+    const personResult = await conn.query('INSERT INTO person (first_name, last_name, date_of_birth, role) VALUES (?,?,?,?)', [firstname, lastname, year, role]);
+    if (personResult.affectedRows == 0){
       res.redirect('/register.html?error=invalid_credentials');
+    }else{
+      const person = await conn.query('SELECT person_id FROM person WHERE first_name = ? AND last_name = ? AND role = ?', [firstname, lastname, role]);
+      const idPerson = person[0];
+      const result = await conn.query('INSERT INTO user (username, password) VALUES (?, ?)', [username, hashedPassword]);
+
+      if (result.affectedRows > 0) {
+        req.session.user = { username };
+        res.redirect('/Recommended.html');
+      } else {
+        res.redirect('/register.html?error=invalid_credentials');
+      }
     }
   } catch (err) {
     console.error('Error querying database:', err);
