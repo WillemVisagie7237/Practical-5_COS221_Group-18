@@ -3,16 +3,24 @@
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      background-color: #f0f0f0;
+      background-color: #f0f0f0;      
     }
     h2 {
+      margin-top:  50px ;
+      margin-bottom: 20px;
       color: #333;
+      text-align: center;
     }
     form {
       background-color: #fff;
+      width: 800px;
       padding: 20px;
       border-radius: 5px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin: 0 auto;
+    }
+    form p{
+      margin-bottom: 20px;
     }
     label {
       display: block;
