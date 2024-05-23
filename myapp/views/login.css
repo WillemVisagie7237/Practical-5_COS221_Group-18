@@ -202,3 +202,14 @@ input[type="password"] {
 .textInputWrapper:focus-within .textInput::placeholder {
   opacity: 0;
 }
+
+
+.textInputWrapper i {
+  position: absolute;
+  right:17px;
+  top:33px;
+}
+
+.textInputWrapper input{
+  border-radius: 15px;
+}
