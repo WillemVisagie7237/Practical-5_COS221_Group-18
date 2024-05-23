@@ -42,11 +42,9 @@ body {
   }
   
   .content-item {
-    max-width: 670px;
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 20px;
-    margin: 0 auto;
     margin-bottom: 20px;
   }
   

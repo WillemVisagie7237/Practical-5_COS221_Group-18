@@ -9,7 +9,10 @@ const bcrypt = require('bcrypt');
 //Creates Express.js object, along with port number
 const app = express();
 const port = 3007;
-
+console.log('DB_HOST:', process.env.DB_HOST);
+console.log('DB_USER:', process.env.DB_USER);
+console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
+console.log('DB_DATABASE:', process.env.DB_DATABASE);
 //Database connection
 const pool = mariadb.createPool({
   host: process.env.DB_HOST,
@@ -75,7 +78,7 @@ app.get('/', (req, res) => {
 //code for register the user and then sending the user to the recommendations page
 //After you click the submit, it goes to main in 3.5 seconds
 app.post('/register', async (req, res) => {
-  const { username, password, Re_enter_password, role, dob, firstname, lastname} = req.body;
+  const { username, password, Re_enter_password} = req.body;
 
   if (password != Re_enter_password){
     console.error('Password is not the same');
@@ -87,22 +90,12 @@ app.post('/register', async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     conn = await getConnection();
-    const selectedDate = new Date(dob);
-    const year = selectedDate.getFullYear();
-    const personResult = await conn.query('INSERT INTO person (first_name, last_name, date_of_birth, role) VALUES (?,?,?,?)', [firstname, lastname, year, role]);
-    if (personResult.affectedRows == 0){
+    const result = await conn.query('INSERT INTO user (username, password) VALUES (?, ?)', [username, hashedPassword]);
+    if (result.affectedRows > 0) {
+      req.session.user = { username };
+      res.redirect('/Recommended.html');
+    } else {
       res.redirect('/register.html?error=invalid_credentials');
-    }else{
-      const idPerson = await conn.query('SELECT person_id FROM person WHERE first_name = ? AND last_name = ? AND date_of_birth = ?', [firstname, lastname, year]);
-      const id = idPerson[0].person_id;
-      const result = await conn.query('INSERT INTO user (username, password, person_id) VALUES (?, ?, ?)', [username, hashedPassword, id]);
-
-      if (result.affectedRows > 0) {
-        req.session.user = { username };
-        res.redirect('/Recommended.html');
-      } else {
-        res.redirect('/register.html?error=invalid_credentials');
-      }
     }
   } catch (err) {
     console.error('Error querying database:', err);
@@ -167,7 +160,7 @@ app.post('/content', isAuthenticated, async (req, res) => {
       if (type === 'movie') {
         await conn.query('INSERT INTO movie (content_id, runtime) VALUES (?, ?)', [contentId, runtime]);
       } else if (type === 'series') {
-        await conn.query('INSERT INTO series (content_id, seasons , end_year) VALUES (?, ?,?)', [contentId, runtime, releaseYear]);
+        await conn.query('INSERT INTO series (content_id, seasons) VALUES (?, ?)', [contentId, runtime]);
       }
     }
     res.json({ success: true });

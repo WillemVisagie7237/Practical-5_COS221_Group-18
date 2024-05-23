@@ -8,7 +8,9 @@ document.getElementById('contentForm').addEventListener('submit', function(event
   const genre = document.getElementById('genre').value;
   const type = document.getElementById('type').value;
   let runtime = null;
+  if (type === 'movie') {
     runtime = document.getElementById('runtime').value;
+  }
 
   const data = { id, title, description, releaseYear, rating, genre, runtime, type };
 

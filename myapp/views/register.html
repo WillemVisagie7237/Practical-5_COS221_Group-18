@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,53 +13,34 @@
     }
   </style>
 </head>
+
 <body>
   <div class="login-container">
     <h2>Register</h2>
     <form action="/register" method="post">
-      <div class="form-group">
-        <label for="username">Firstname</label>
-        <input type="text" id="firstname" name="firstname" required>
-      </div>
-      <div class="form-group">
-        <label for="username">Lastname</label>
-        <input type="text" id="lastname" name="lastname" required>
-      </div>
-      <div class="form-group">
+      <div class="textInputWrapper">
         <label for="username">Username</label>
         <input type="text" id="username" name="username" required>
       </div>
-      <div class="form-group">
+      <div class="textInputWrapper">
         <label for="password">Password</label>
         <input type="password" id="password" name="password" required>
       </div>
-      <div class="form-group">
+      <div class="textInputWrapper">
         <label for="password">Re-enter Password</label>
         <input type="password" id="password" name="Re_enter_password" required>
       </div>
-      <div class="form-group">
-        <label for="password">Date of Birth</label>
-        <input type="date" id="dob" name="dob" required>
-      </div>
-      <div>
-        <label for="password">Role</label>
-        <select id="roleSelect" name="role">
-          <option value="User">User</option>
-          <option value="Writer">Writer</option>
-          <option value="Actor">Actor</option>
-          <option value="Director">Director</option>
-        </select>
-      </div>
-      <button type="submit">Register</button>
-    </form>  <br>
-    <a href="login.html">Login</a>
+      <button type="submit" class="button">Register</button>
+      <button class="button" id="loginButton">Login</button>
+    </form> <br>
+
   </div>
+  <script>
+    document.getElementById('loginButton').addEventListener('click', function () {
+      // Action to be performed on button click
+      window.location.href = 'login.html';
+    });
+  </script>
 </body>
-<script>
-  const roleSelect = document.getElementById("roleSelect");
-  const selectedRoleInput = document.getElementById("selectedRole");
-  roleSelect.addEventListener("change", function() {
-    selectedRoleInput.value = this.value;
-  });
-</script>
+
 </html>

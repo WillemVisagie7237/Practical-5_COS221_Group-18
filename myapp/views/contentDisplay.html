@@ -36,6 +36,7 @@
       <label for="ratingRange">Rating Range:</label>
       <input type="text" id="ratingRange" placeholder="X.X-X.X">
       <button onclick="applyFilters()">Apply Filters</button>
+      <button onclick="redirectToRecommended()">Recommended Movies/TV Series</button> <!-- New button -->
     </div>
   </header>
   <main id="content">
@@ -54,6 +55,10 @@
       window.addEventListener('load', fetchAndDisplayContent);
       window.addEventListener('load', populateDropdowns);
       window.addEventListener('load', populateStudioDropdown);
+
+    function redirectToRecommended() {
+      window.location.href = "recommended.html";
+    }
   </script>
 </body>
 </html>
