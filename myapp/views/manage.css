@@ -1,22 +1,29 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f7f7f7;
+    background-color: #ffffff;
     margin: 0;
     padding: 0;
+    color: #fff;
   }
   
   .container {
     max-width: 800px;
-    margin: 0 auto;
+    margin: 80px auto;
     padding: 20px;
-    background-color: #fff;
+    background-color: #0b5ba7;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: 0.3s;
   }
+
+  .container:hover {
+    transform: translateY(-5px);
+  }
+  
   
   h1 {
     text-align: center;
-    color: #333;
+    color: #fff;
   }
   
   section {
@@ -24,8 +31,14 @@ body {
   }
   
   h2 {
+    text-align: center;
     margin-top: 0;
-    color: #555;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  #personId{
+    margin-bottom: 10px;
   }
   
   input[type="text"],
@@ -40,19 +53,17 @@ body {
   
   button {
     padding: 10px 20px;
-    background-color:#007bff;
-    color: white;
+    background-color:#fff;
+    color: black;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    margin-bottom: 10px;
+    transition: 0.5s;
   }
   
   button:hover {
     background-color: #007bff;
-  }
-  
-  /* Add gap between buttons */
-  .button-gap {
-    margin-bottom: 10px;
+    color: white;
   }
   
