@@ -306,9 +306,11 @@ function fetchAndDisplayContent() {
           <p>Release Year: ${content.release_year}</p>
           <p>Rating: ${content.rating}</p>
           <p>Genre: ${content.genre}</p>
+          <p>Production Studio ID: ${content.studio_name}</p>
           <!-- Add more details as needed -->
 
           <!-- Add edit/delete buttons or links here -->
+          <button onclick="goToDetailsPage(${content.id})">Go to Details Page</button>
         `;
 
         contentContainer.appendChild(contentElement);
@@ -318,6 +320,15 @@ function fetchAndDisplayContent() {
       console.error('Error fetching content:', error);
     });
 }
+
+
+
+
+
+function goToDetailsPage(contentId) {
+  window.location.href = `/ViewDetails.html?id=${contentId}`;
+}
+
 
 function populateDropdowns() {
   fetch('/content/genres')
@@ -426,6 +437,7 @@ function displayContent(contentArray) {
 
     // Populate content details
     contentElement.innerHTML = `
+    
       <h2>${content.title}</h2>
       <p>Description: ${content.description}</p>
       <p>Release Year: ${content.release_year}</p>
