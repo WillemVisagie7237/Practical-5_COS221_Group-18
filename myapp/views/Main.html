@@ -78,12 +78,33 @@
   <script src="script.js"></script>
   
   <script>
-    // Fetch and insert the navigation bar
     fetch('navbar.html')
       .then(response => response.text())
       .then(data => {
         document.getElementById('navbar').innerHTML = data;
+        
+        // Execute script after navbar insertion
+        document.dispatchEvent(new Event('navbarLoaded'));
       });
+
+    // Listen for navbarLoaded event and execute script
+    document.addEventListener('navbarLoaded', () => {
+      // Fetch user role from the server
+      fetch('/user/role')
+        .then(response => response.json())
+        .then(data => {
+          const userRole = data.role;
+
+          // Hide or disable the Main and Manage links if the user is not an admin
+          if (userRole !== 'admin') {
+            const mainLink = document.querySelector('#navbar-links li:nth-child(1)');
+            const manageLink = document.querySelector('#navbar-links li:nth-child(2)');
+            mainLink.style.display = 'none'; // Hide the list item containing the Main link
+            manageLink.style.display = 'none'; // Hide the list item containing the Manage link
+          }
+        })
+        .catch(error => console.error('Error fetching user role:', error));
+    });
   </script>
 </body>
 </html>
