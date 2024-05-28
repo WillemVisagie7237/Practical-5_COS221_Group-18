@@ -19,46 +19,40 @@
         <option value="title">Title</option>
         <option value="releaseYear">Release Year</option>
         <option value="rating">Rating</option>
-        <!-- Add more options as needed -->
       </select>
       <label for="genre">Genre:</label>
       <select id="genre">
         <option value="">All Genres</option>
-        <!-- Populate with genres dynamically -->
       </select>
       <label for="productionStudio">Production Studio:</label>
       <select id="productionStudio">
         <option value="">All Studios</option>
-        <!-- Populate with production studios dynamically -->
       </select>
       <label for="releaseYearRange">Release Year Range:</label>
       <input type="text" id="releaseYearRange" placeholder="YYYY-YYYY">
       <label for="ratingRange">Rating Range:</label>
       <input type="text" id="ratingRange" placeholder="X.X-X.X">
       <button onclick="applyFilters()">Apply Filters</button>
-      <button onclick="redirectToRecommended()">Recommended Movies/TV Series</button> <!-- New button -->
     </div>
   </header>
+  
   <main id="content">
-    <!-- Content will be inserted here -->
+    <!-- Content will be displayed here -->
   </main>
 
   <script src="script.js"></script>
-  
   <script>
     // Fetch and insert the navigation bar
     fetch('navbar.html')
       .then(response => response.text())
       .then(data => {
         document.getElementById('navbar').innerHTML = data;
-      });                            
-      window.addEventListener('load', fetchAndDisplayContent);
-      window.addEventListener('load', populateDropdowns);
-      window.addEventListener('load', populateStudioDropdown);
+      });
 
-    function redirectToRecommended() {
-      window.location.href = "recommended.html";
-    }
+    // Load content and populate dropdowns on page load
+    window.addEventListener('load', fetchAndDisplayContent);
+    window.addEventListener('load', populateDropdowns);
+    window.addEventListener('load', populateStudioDropdown);
   </script>
 </body>
 </html>
