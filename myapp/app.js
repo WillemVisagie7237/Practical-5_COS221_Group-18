@@ -58,7 +58,7 @@ app.get('/contentDisplay.html', isAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'contentDisplay.html'));
 });
 
-app.use(express.static(path.join(__dirname, 'views')));
+
 
 //Gets the connection to the database
 const getConnection = async () => {
@@ -112,16 +112,16 @@ app.post('/login', async (req, res) => {
   let conn;
   try {
     conn = await getConnection();
-    const user = await conn.query('SELECT * FROM user WHERE username = ?', [username]);
+    const user = await conn.query('SELECT person_id, password FROM user WHERE username = ?', [username]); // Select only the user ID and password
     if (user.length > 0) {
-      const newUser = user[0];
-      const hashPassword = newUser.password;
+      const userId = user[0].id; // Extract user ID from the user object
+      const hashPassword = user[0].password;
       const isMatch = await bcrypt.compare(password, hashPassword);
       if (isMatch){
-        req.session.user = user;
+        req.session.user = { id: userId }; // Store only the user ID in the session
         res.redirect('/Main.html');
-      }else{
-        res.redirect('/login.html?error=invalid_credentials')
+      } else {
+        res.redirect('/login.html?error=invalid_credentials');
       }
     } else {
       res.redirect('/login.html?error=invalid_credentials');
@@ -133,6 +133,7 @@ app.post('/login', async (req, res) => {
     if (conn) conn.release();
   }
 });
+
 
 //Just a normal logout
 app.get('/logout', (req, res) => {
@@ -595,6 +596,116 @@ app.get('/recommendations', isAuthenticated, async (req, res) => {
   }
 });
 
+
+app.get('/content/:content_id', async (req, res) => {
+  const contentId = req.params.content_id;
+  const query = `
+      SELECT c.*, ps.name as studio_name
+      FROM content c
+      LEFT JOIN production_studio ps ON c.production_studio_id = ps.id
+      WHERE c.id = ?
+  `;
+  try {
+      const conn = await getConnection();
+      const results = await conn.query(query, [contentId]);
+      if (results.length > 0) {
+          res.json(results[0]);
+      } else {
+          res.status(404).json({ error: 'Content not found' });
+      }
+      conn.release();
+  } catch (err) {
+      console.error('Error querying database:', err);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+// GET endpoint to fetch reviews for a content
+app.get('/reviews/:id', isAuthenticated, async (req, res) => {
+  const { id } = req.params;
+
+  let conn;
+  try {
+    conn = await getConnection();
+    const reviews = await conn.query('SELECT * FROM review WHERE content_id = ?', [id]);
+
+    res.json(reviews);
+  } catch (err) {
+    console.error('Error fetching reviews:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    if (conn) conn.release();
+  }
+});
+
+
+// POST endpoint to add a review for a content
+app.post('/add-review', isAuthenticated, async (req, res) => {
+  const { content_id, username, comment, rating } = req.body;
+
+  let conn;
+  try {
+    conn = await getConnection();
+    const result = await conn.query('INSERT INTO review (content_id, username, comment, date, rating) VALUES (?, ?, ?, NOW(), ?)', [content_id, username, comment, rating]);
+
+    if (result.affectedRows > 0) {
+      res.json({ success: true });
+    } else {
+      res.status(500).json({ error: 'Error adding review' });
+    }
+  } catch (err) {
+    console.error('Error adding review:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    if (conn) conn.release();
+  }
+});
+
+
+app.get('/user/role', async (req, res) => {
+  const userId = req.session.user.id; 
+  try {
+    const user = await getUserById(userId); 
+    if (user && user.role) {
+      res.json({ role: user.role });
+    } else {
+      res.status(404).json({ error: 'User not found or role not defined' });
+    }
+  } catch (error) {
+    console.error('Error fetching user role:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+async function getUserById(userId) {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const user = await conn.query(`
+      SELECT p.role
+      FROM user u
+      JOIN person p ON u.person_id = p.person_id
+      WHERE u.person_id = ?
+    `, [userId]);
+    return user[0];
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    throw error;
+  } finally {
+    if (conn) conn.release(); // Release the connection
+  }
+}
+
+
+
+
+
+
+
+
+app.use(express.static(path.join(__dirname, 'views')));
 
 app.listen(port, () => {
   console.log(`Server is listening at http://localhost:${port}`);
