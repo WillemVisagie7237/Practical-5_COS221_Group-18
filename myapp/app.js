@@ -11,7 +11,7 @@ const app = express();
 const port = 3007;
 console.log('DB_HOST:', process.env.DB_HOST);
 console.log('DB_USER:', process.env.DB_USER);
-console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
+//console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
 console.log('DB_DATABASE:', process.env.DB_DATABASE);
 //Database connection
 const pool = mariadb.createPool({
@@ -78,11 +78,17 @@ app.get('/', (req, res) => {
 //code for register the user and then sending the user to the recommendations page
 //After you click the submit, it goes to main in 3.5 seconds
 app.post('/register', async (req, res) => {
-  const { username, password, Re_enter_password} = req.body;
+  const { firstname, lastname, year, password, Re_enter_password, role, username} = req.body;
 
   if (password != Re_enter_password){
-    console.error('Password is not the same');
+    console.log('Password is not the same');
     res.redirect('/register.html?error=password_mismatch');
+    return;
+  }
+
+  if (year >= new Date().getFullYear()){
+    console.log('Year is not valid');
+    res.redirect('/register.html?year_not_valid');
     return;
   }
 
@@ -90,7 +96,22 @@ app.post('/register', async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     conn = await getConnection();
-    const result = await conn.query('INSERT INTO user (username, password) VALUES (?, ?)', [username, hashedPassword]);
+
+    const personResult = await conn.query('INSERT INTO person (first_name, last_name, date_of_birth, role) VALUES (?,?,?,?)', [firstname, lastname, year, role]);
+    if (personResult.affectedRows == 0){
+      console.error('Failed to insert person');
+      res.redirect('/register.html?error=insertion_failed');
+      return;
+    }
+
+    /*const personId = await conn.query('SELECT person_id FROM person WHERE first_name = ? AND last_name = ? AND date_of_birth = ? AND role = ?', [firstname, lastname, year, role]);
+    if (personId.length == 0){
+      console.error('No such ID');
+      res.redirect('/register.html?error=no_id');
+      return;
+    }*/
+
+    const result = await conn.query('INSERT INTO user (username, password, person_id) VALUES (?, ?, ?)', [username, hashedPassword, personResult.person_id]);
     if (result.affectedRows > 0) {
       req.session.user = { username };
       res.redirect('/Recommended.html');
