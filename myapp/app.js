@@ -112,6 +112,7 @@ app.post('/register', async (req, res) => {
     }
 
     const person_id = personId[0].person_id;
+    req.session.role = { role: role };
 
     const result = await conn.query('INSERT INTO user (username, password, person_id) VALUES (?, ?, ?)', [username, hashedPassword, person_id]);
     if (result.affectedRows > 0) {
@@ -135,13 +136,15 @@ app.post('/login', async (req, res) => {
   let conn;
   try {
     conn = await getConnection();
-    const user = await conn.query('SELECT person_id, password FROM user WHERE username = ?', [username]); // Select only the user ID and password
+    const user = await conn.query('SELECT person_id, password, role FROM user WHERE username = ?', [username]); // Select only the user ID and password
     if (user.length > 0) {
       const userId = user[0].id; // Extract user ID from the user object
       const hashPassword = user[0].password;
+      const role = user[0].role;
       const isMatch = await bcrypt.compare(password, hashPassword);
       if (isMatch){
         req.session.user = { id: userId }; // Store only the user ID in the session
+        req.session.role = { role: role };
         res.redirect('/Main.html');
       } else {
         res.redirect('/login.html?error=invalid_credentials');
