@@ -104,14 +104,16 @@ app.post('/register', async (req, res) => {
       return;
     }
 
-    /*const personId = await conn.query('SELECT person_id FROM person WHERE first_name = ? AND last_name = ? AND date_of_birth = ? AND role = ?', [firstname, lastname, year, role]);
+    const personId = await conn.query('SELECT * FROM person WHERE first_name = ? AND last_name = ? AND date_of_birth = ? AND role = ?', [firstname, lastname, year, role]);
     if (personId.length == 0){
       console.error('No such ID');
       res.redirect('/register.html?error=no_id');
       return;
-    }*/
+    }
 
-    const result = await conn.query('INSERT INTO user (username, password, person_id) VALUES (?, ?, ?)', [username, hashedPassword, personResult.person_id]);
+    const person_id = personId[0].person_id;
+
+    const result = await conn.query('INSERT INTO user (username, password, person_id) VALUES (?, ?, ?)', [username, hashedPassword, person_id]);
     if (result.affectedRows > 0) {
       req.session.user = { username };
       res.redirect('/Recommended.html');
