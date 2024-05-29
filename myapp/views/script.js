@@ -1,3 +1,40 @@
+document.addEventListener('DOMContentLoaded', () => {
+  // Get the user's role from the URL query parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const userRole = urlParams.get('role');
+  
+  // Set the user's role as a cookie
+  document.cookie = `userRole=${userRole}`;
+});
+
+document.addEventListener('click', (event) => {
+  const target = event.target;
+  if (target.tagName === 'A') {
+      const href = target.getAttribute('href');
+      if ((href === '/manage.html' || href === '/Main.html') && getCookie('userRole') !== 'admin') {
+          event.preventDefault(); // Prevent default navigation
+          alert('You are not authorized to access this page.');
+          window.location.href = 'Recommended.html'; // Corrected redirect
+      }
+  }
+});
+
+// Function to get a cookie value by name
+function getCookie(name) {
+  const nameEQ = `${name}=`;
+  const cookies = document.cookie.split(';');
+  for (let i = 0; i < cookies.length; i++) {
+      let cookie = cookies[i];
+      while (cookie.charAt(0) === ' ') {
+          cookie = cookie.substring(1, cookie.length);
+      }
+      if (cookie.indexOf(nameEQ) === 0) {
+          return cookie.substring(nameEQ.length, cookie.length);
+      }
+  }
+  return null;
+}
+
 document.getElementById('contentForm').addEventListener('submit', function(event) {
   event.preventDefault();
   const id = document.getElementById('id').value;
@@ -455,43 +492,6 @@ function displayContent(contentArray) {
 }
 
 document.getElementById('filter-button').addEventListener('click', applyFilters);
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Get the user's role from the URL query parameters
-  const urlParams = new URLSearchParams(window.location.search);
-  const userRole = urlParams.get('role');
-  
-  // Set the user's role as a cookie
-  document.cookie = `userRole=${userRole}`;
-});
-
-document.addEventListener('click', (event) => {
-  const target = event.target;
-  if (target.tagName === 'A') {
-      const href = target.getAttribute('href');
-      if ((href === '/manage.html' || href === '/Main.html') && getCookie('userRole') !== 'admin') {
-          event.preventDefault(); // Prevent default navigation
-          alert('You are not authorized to access this page.');
-          window.location.href = 'Recommended.html'; // Corrected redirect
-      }
-  }
-});
-
-// Function to get a cookie value by name
-function getCookie(name) {
-  const nameEQ = `${name}=`;
-  const cookies = document.cookie.split(';');
-  for (let i = 0; i < cookies.length; i++) {
-      let cookie = cookies[i];
-      while (cookie.charAt(0) === ' ') {
-          cookie = cookie.substring(1, cookie.length);
-      }
-      if (cookie.indexOf(nameEQ) === 0) {
-          return cookie.substring(nameEQ.length, cookie.length);
-      }
-  }
-  return null;
-}
 
 
 
