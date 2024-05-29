@@ -302,7 +302,7 @@ function fetchAndDisplayContent() {
         // Populate content details
         contentElement.innerHTML = `
         
-        <a href="/ViewDetails.html?id=${content.id}" style="text-decoration: none;">
+        <a href="/ViewDetails.html?id=${content.id}" style="text-decoration: none; color: black">
           <h2>${content.title}</h2>
           <p>Description: ${content.description}</p>
           <p>Release Year: ${content.release_year}</p>
