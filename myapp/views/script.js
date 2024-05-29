@@ -301,6 +301,8 @@ function fetchAndDisplayContent() {
 
         // Populate content details
         contentElement.innerHTML = `
+        
+        <a href="/ViewDetails.html?id=${content.id}" style="text-decoration: none;">
           <h2>${content.title}</h2>
           <p>Description: ${content.description}</p>
           <p>Release Year: ${content.release_year}</p>
@@ -310,7 +312,8 @@ function fetchAndDisplayContent() {
           <!-- Add more details as needed -->
 
           <!-- Add edit/delete buttons or links here -->
-          <button onclick="goToDetailsPage(${content.id})">Go to Details Page</button>
+         
+          </a>
         `;
 
         contentContainer.appendChild(contentElement);
@@ -452,7 +455,6 @@ function displayContent(contentArray) {
 }
 
 document.getElementById('filter-button').addEventListener('click', applyFilters);
-
 
 
 
