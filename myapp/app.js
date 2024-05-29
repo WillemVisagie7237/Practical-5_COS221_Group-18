@@ -146,7 +146,7 @@ app.post('/login', async (req, res) => {
         const roleResult = await conn.query('SELECT role FROM person WHERE person_id = ?', [userId]);
         const role = roleResult[0].role;
         req.session.role = { role: role };
-        res.redirect(`/Main.html?role=`);
+        res.redirect(`/Recommended.html`);
       } else {
         res.redirect('/login.html?error=invalid_credentials');
       }
