@@ -117,7 +117,7 @@ app.post('/register', async (req, res) => {
     const result = await conn.query('INSERT INTO user (username, password, person_id) VALUES (?, ?, ?)', [username, hashedPassword, person_id]);
     if (result.affectedRows > 0) {
       req.session.user = { username };
-      res.redirect(`/Recommended.html`);
+      res.redirect(`/Recommended.html?role=${role}`);
     } else {
       res.redirect('/register.html?error=invalid_credentials');
     }
@@ -146,7 +146,7 @@ app.post('/login', async (req, res) => {
         const roleResult = await conn.query('SELECT role FROM person WHERE person_id = ?', [userId]);
         const role = roleResult[0].role;
         req.session.role = { role: role };
-        res.redirect(`/Recommended.html`);
+        res.redirect(`/Recommended.html?role=${role}`);
       } else {
         res.redirect('/login.html?error=invalid_credentials');
       }
