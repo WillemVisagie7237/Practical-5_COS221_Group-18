@@ -117,7 +117,7 @@ app.post('/register', async (req, res) => {
     const result = await conn.query('INSERT INTO user (username, password, person_id) VALUES (?, ?, ?)', [username, hashedPassword, person_id]);
     if (result.affectedRows > 0) {
       req.session.user = { username };
-      res.redirect('/Recommended.html');
+      res.redirect(`/Recommended.html`);
     } else {
       res.redirect('/register.html?error=invalid_credentials');
     }
@@ -136,16 +136,17 @@ app.post('/login', async (req, res) => {
   let conn;
   try {
     conn = await getConnection();
-    const user = await conn.query('SELECT person_id, password, role FROM user WHERE username = ?', [username]); // Select only the user ID and password
+    const user = await conn.query('SELECT person_id, password FROM user WHERE username = ?', [username]); // Select only the user ID and password
     if (user.length > 0) {
-      const userId = user[0].id; // Extract user ID from the user object
+      const userId = user[0].person_id; // Extract user ID from the user object
       const hashPassword = user[0].password;
-      const role = user[0].role;
       const isMatch = await bcrypt.compare(password, hashPassword);
       if (isMatch){
         req.session.user = { id: userId }; // Store only the user ID in the session
+        const roleResult = await conn.query('SELECT role FROM person WHERE person_id = ?', [userId]);
+        const role = roleResult[0].role;
         req.session.role = { role: role };
-        res.redirect('/Main.html');
+        res.redirect(`/Main.html?role=`);
       } else {
         res.redirect('/login.html?error=invalid_credentials');
       }
@@ -723,13 +724,6 @@ async function getUserById(userId) {
     if (conn) conn.release(); // Release the connection
   }
 }
-
-
-
-
-
-
-
 
 app.use(express.static(path.join(__dirname, 'views')));
 

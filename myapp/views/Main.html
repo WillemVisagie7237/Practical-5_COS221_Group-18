@@ -82,6 +82,16 @@
       .then(response => response.text())
       .then(data => {
         document.getElementById('navbar').innerHTML = data;
+        const urlParams = new URLSearchParams(window.location.search);
+        const role = urlParams.get('role');
+
+        if (role === 'admin') {
+          // Show the Manage link
+          navbarElement.querySelector('a[href="/manage.html"]').style.display = 'block';
+        } else {
+          // Hide the Manage link
+          navbarElement.querySelector('a[href="/manage.html"]').style.display = 'none';
+        }
         
         // Execute script after navbar insertion
         document.dispatchEvent(new Event('navbarLoaded'));
